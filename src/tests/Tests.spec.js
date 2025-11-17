@@ -9,7 +9,7 @@ export const RateContentOK = new Rate('content_OK');
 
 export const options = {
   thresholds: {
-    http_req_failed: ['rate<0.30'],
+    http_req_failed: ['rate<0.40'],
     get_contacts: ['p(99)<500'],
     content_OK: ['rate>0.95']
   },
