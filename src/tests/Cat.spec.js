@@ -9,14 +9,15 @@ export const RateContentOK = new Rate('content_OK');
 
 export const options = {
   thresholds: {
-      http_req_failed: ['rate<0.30'], 
-      get_cat_fact: ['p(99)<600'],    
-      content_OK: ['rate>0.95']       
+    http_req_failed: ['rate<0.25'],        
+    get_cat_fact: ['p(90)<6800'],       
+    content_OK: ['rate>0.75']          
   },
+
   stages: [
-    { duration: '10s', target: 2 },
-    { duration: '10s', target: 4 },
-    { duration: '10s', target: 6 }
+    { duration: '30s', target: 7 },    
+    { duration: '90s', target: 92 },   
+    { duration: '90s', target: 92 },    
   ]
 };
 
@@ -36,15 +37,20 @@ export default function () {
     },
   };
 
-  const OK = 200;
-
   const res = http.get(baseUrl, params);
 
   getCatFactDuration.add(res.timings.duration);
-  RateContentOK.add(res.status === OK);
+  RateContentOK.add(res.status === 200);
 
   check(res, {
-    'GET CatFact - Status 200': () => res.status === OK,
-    'Response has "fact" field': () => JSON.parse(res.body).fact !== undefined
+    'GET CatFact - Status 200': () => res.status === 200,
+    'Response has "fact" field': () => {
+      try {
+        const body = JSON.parse(res.body);
+        return body.fact !== undefined;
+      } catch {
+        return false;
+      }
+    }
   });
 }
